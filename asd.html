@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div id="app">
+        <input type="text" v-model="test">
+        <button @click="add()">add</button>
+        <com-a v-for="(item,i) in arr" 
+            :key="i" 
+            :test="item" 
+            :myid="i"
+            @delid="delid"
+            @update="update"
+        ></com-a>
+    </div>
+    <script src="./vue.js"></script>
+    <script>
+      Vue.component('comA',{
+          template:`
+            <div class="comA" style='display:flex'>
+                <span v-show="!open">{{test}}</span>
+                <button @click="updateOpen()" v-show="!open">修改</button>
+                <button @click="del()" v-show="!open">删除</button>
+                <input type="text" v-model="child" v-show="open">
+                <button @click="update()" v-show="open">修改</button>
+            </div>
+            `,
+          props:{
+            test:{
+                type:String
+            },
+            myid:{
+                type:Number
+            }
+          },
+          methods:{
+            del(){
+                this.$emit('delid',this.myid)
+            },
+            updateOpen(){
+                this.open = !this.open
+            },
+            update(){
+                this.open = !this.open
+                let kita = {
+                    val:this.myid,
+                    text:this.child
+                }
+                this.$emit('update',kita)
+            }
+          },
+          data(){
+              return{
+                  child:this.test,
+                  open:false
+              }
+          }
+      })
+      var app = new Vue({
+        el: '#app',
+        data: {
+            test:'',
+            arr:[]
+        },
+        methods:{
+            add(){
+                this.arr.push(this.test)
+                this.test = ''
+            },
+            delid(val){
+                this.arr.splice(val,1)
+            },
+            update(kita){
+                this.arr.splice(kita.val,1,kita.text)
+            }
+        }
+
+    })
+    </script>
+</body>
+</html>
